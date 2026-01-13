@@ -23,18 +23,21 @@
     }
   </script>
 
-  <!-- Manifest -->
-  <link rel="manifest" href="/manifest.webmanifest" />
+  <!-- Base path untuk GitHub Pages -->
+  <base href="/hafalan-retyping/">
+
+  <!-- Manifest & ikon -->
+  <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#0f172a" />
-  <link rel="icon" href="/icons/icon-192.png" sizes="192x192" type="image/png" />
-  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+  <link rel="icon" href="icons/icon-192.png" sizes="192x192" type="image/png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
 </head>
 <body class="min-h-screen bg-slate-900 text-white">
   <header class="flex items-center justify-between px-4 py-3 border-b border-slate-800">
     <h1 class="text-xl font-semibold tracking-wide">hafalan retyping</h1>
     <div class="flex items-center gap-2">
-      <button id="installBtn" class="hidden px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 smooth text-sm">Install</button>
-      <button id="logoutBtn" class="hidden px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 smooth text-sm">Log keluar</button>
+      <button id="installBtn" class="hidden px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 text-sm">Install</button>
+      <button id="logoutBtn" class="hidden px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 text-sm">Log keluar</button>
     </div>
   </header>
 
@@ -53,8 +56,13 @@
     <!-- Page subjects -->
     <section id="page-subjects" class="hidden">
       <div class="mb-4 flex items-center gap-2">
-        <input id="subjectSearch" type="text" placeholder="Cari subjek..." class="w-full px-3 py-2 rounded bg-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-700" />
-        <button id="addSubjectBtn" class="px-3 py-2 rounded bg-slate-800 hover:bg-slate-700 font-semibold">Tambah subjek</button>
+        <input id="subjectSearch" type="text" placeholder="Cari subjek..." 
+               class="w-full px-3 py-2 rounded bg-slate-800 placeholder-slate-400 
+                      focus:outline-none focus:ring-2 focus:ring-slate-700" />
+        <button id="addSubjectBtn" 
+                class="px-3 py-2 rounded bg-slate-800 hover:bg-slate-700 font-semibold">
+          Tambah subjek
+        </button>
       </div>
       <div id="subjectsList" class="grid gap-2"></div>
     </section>
@@ -62,12 +70,20 @@
     <!-- Page topics -->
     <section id="page-topics" class="hidden">
       <div class="mb-2 flex items-center justify-between">
-        <button id="backToSubjects" class="px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 text-sm">Kembali</button>
+        <button id="backToSubjects" 
+                class="px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 text-sm">
+          Kembali
+        </button>
         <h3 id="currentSubjectName" class="font-semibold tracking-wide"></h3>
       </div>
       <div class="mb-4 flex items-center gap-2">
-        <input id="topicSearch" type="text" placeholder="Cari topik..." class="w-full px-3 py-2 rounded bg-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-700" />
-        <button id="addTopicBtn" class="px-3 py-2 rounded bg-slate-800 hover:bg-slate-700 font-semibold">Tambah topik</button>
+        <input id="topicSearch" type="text" placeholder="Cari topik..." 
+               class="w-full px-3 py-2 rounded bg-slate-800 placeholder-slate-400 
+                      focus:outline-none focus:ring-2 focus:ring-slate-700" />
+        <button id="addTopicBtn" 
+                class="px-3 py-2 rounded bg-slate-800 hover:bg-slate-700 font-semibold">
+          Tambah topik
+        </button>
       </div>
       <div id="topicsList" class="grid gap-2"></div>
     </section>
@@ -75,12 +91,20 @@
     <!-- Page facts -->
     <section id="page-facts" class="hidden">
       <div class="mb-2 flex items-center justify-between">
-        <button id="backToTopics" class="px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 text-sm">Kembali</button>
+        <button id="backToTopics" 
+                class="px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 text-sm">
+          Kembali
+        </button>
         <h3 id="currentTopicName" class="font-semibold tracking-wide"></h3>
       </div>
       <div class="mb-4 flex items-center gap-2">
-        <input id="factSearch" type="text" placeholder="Cari fakta..." class="w-full px-3 py-2 rounded bg-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-700" />
-        <button id="addFactBtn" class="px-3 py-2 rounded bg-slate-800 hover:bg-slate-700 font-semibold">Tambah fakta hafalan</button>
+        <input id="factSearch" type="text" placeholder="Cari fakta..." 
+               class="w-full px-3 py-2 rounded bg-slate-800 placeholder-slate-400 
+                      focus:outline-none focus:ring-2 focus:ring-slate-700" />
+        <button id="addFactBtn" 
+                class="px-3 py-2 rounded bg-slate-800 hover:bg-slate-700 font-semibold">
+          Tambah fakta hafalan
+        </button>
       </div>
       <div id="factsList" class="grid gap-2"></div>
     </section>
@@ -88,8 +112,13 @@
     <!-- Page practice -->
     <section id="page-practice" class="hidden">
       <div class="mb-2 flex items-center justify-between">
-        <button id="backToFacts" class="px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 text-sm">Kembali</button>
-        <div class="text-sm text-slate-300">Jumlah ulangan: <span id="practiceCount">0</span></div>
+        <button id="backToFacts" 
+                class="px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 text-sm">
+          Kembali
+        </button>
+        <div class="text-sm text-slate-300">
+          Jumlah ulangan: <span id="practiceCount">0</span>
+        </div>
       </div>
       <div class="mb-3">
         <h4 class="font-semibold tracking-wide mb-1">Fakta</h4>
@@ -100,11 +129,17 @@
         <div id="practiceFactSentence" class="text-slate-200"></div>
       </div>
       <div class="mb-3">
-        <button id="addPracticeRowBtn" class="px-3 py-2 rounded bg-slate-800 hover:bg-slate-700 font-semibold">Tambah ulangan</button>
+        <button id="addPracticeRowBtn" 
+                class="px-3 py-2 rounded bg-slate-800 hover:bg-slate-700 font-semibold">
+          Tambah ulangan
+        </button>
       </div>
       <div id="practiceRows" class="grid gap-4"></div>
       <div class="mt-4">
-        <button id="submitPracticeBtn" class="px-4 py-2 rounded bg-slate-800 hover:bg-slate-700 font-semibold">Done</button>
+        <button id="submitPracticeBtn" 
+                class="px-4 py-2 rounded bg-slate-800 hover:bg-slate-700 font-semibold">
+          Done
+        </button>
       </div>
       <p id="practiceFeedback" class="mt-2 text-slate-300"></p>
     </section>
@@ -117,8 +152,10 @@
   <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, getDocs, query, orderBy, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } 
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, getDocs, query, orderBy, enableIndexedDbPersistence } 
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDa3a8CIca9rqjOFnYILwfr2miOFARk6Y8",
@@ -134,10 +171,243 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
     const db = getFirestore(app);
+
+    // Enable offline persistence
     enableIndexedDbPersistence(db).catch(err => console.warn("Persistence error:", err.code));
 
-    // ... (logik SPA sama seperti yang kita bincang: login, subjects, topics, facts, practice)
-    // Kau boleh guna kod penuh yang aku bagi sebelum ni, cuma gantikan firebaseConfig dengan yang ini.
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(console.error);
+    }
+
+    // State
+    let uid = null;
+    let currentSubject = null;
+    let currentTopic = null;
+    let currentFact = null;
+
+    // Elements
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const installBtn = document.getElementById('installBtn');
+
+    // Auth logic
+    loginBtn.addEventListener('click', async () => {
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (e) {
+        console.error(e);
+        alert('Log masuk gagal: ' + e.message);
+      }
+    });
+
+    logoutBtn.addEventListener('click', async () => {
+      await signOut(auth);
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        uid = user.uid;
+        logoutBtn.classList.remove('hidden');
+        installBtn.classList.remove('hidden');
+        showPage('subjects');
+        await loadSubjects();
+      } else {
+        uid = null;
+        logoutBtn.classList.add('hidden');
+        showPage('login');
+      }
+    });
+
+    // Simple SPA routing
+    const pages = {
+      login: document.getElementById('page-login'),
+      subjects: document.getElementById('page-subjects'),
+      topics: document.getElementById('page-topics'),
+      facts: document.getElementById('page-facts'),
+      practice: document.getElementById('page-practice'),
+    };
+    function showPage(name) {
+      Object.values(pages).forEach(el => el.classList.add('hidden'));
+      pages[name].classList.remove('hidden');
+    }
+
+    // === Subjects ===
+    const subjectSearch = document.getElementById('subjectSearch');
+    const addSubjectBtn = document.getElementById('addSubjectBtn');
+    const subjectsList = document.getElementById('subjectsList');
+
+    async function loadSubjects(filterText = '') {
+      if (!uid) return;
+      subjectsList.innerHTML = '';
+      const q = query(collection(db, 'users', uid, 'subjects'), orderBy('createdAt', 'asc'));
+      const snap = await getDocs(q);
+      snap.forEach(d => {
+        const data = d.data();
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between bg-slate-800 rounded px-3 py-2';
+        const btn = document.createElement('button');
+        btn.className = 'flex-1 text-left hover:text-blue-400';
+        btn.textContent = data.name;
+        btn.onclick = () => enterSubject({id: d.id, name: data.name});
+        row.appendChild(btn);
+        subjectsList.appendChild(row);
+      });
+    }
+    subjectSearch.addEventListener('input', e => loadSubjects(e.target.value));
+    addSubjectBtn.addEventListener('click', async () => {
+      const name = prompt('Nama subjek:');
+      if (name) {
+        await addDoc(collection(db, 'users', uid, 'subjects'), {name, createdAt: Date.now()});
+        loadSubjects();
+      }
+    });
+    function enterSubject(s) {
+      currentSubject = s;
+      document.getElementById('currentSubjectName').textContent = s.name;
+      showPage('topics');
+      loadTopics();
+    }
+
+    // === Topics ===
+    const topicSearch = document.getElementById('topicSearch');
+    const addTopicBtn = document.getElementById('addTopicBtn');
+    const topicsList = document.getElementById('topicsList');
+    const backToSubjects = document.getElementById('backToSubjects');
+
+    async function loadTopics(filterText = '') {
+      if (!uid || !currentSubject) return;
+      topicsList.innerHTML = '';
+      const q = query(collection(db, 'users', uid, 'subjects', currentSubject.id, 'topics'), orderBy('createdAt', 'asc'));
+      const snap = await getDocs(q);
+      snap.forEach(d => {
+        const data = d.data();
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between bg-slate-800 rounded px-3 py-2';
+        const btn = document.createElement('button');
+        btn.className = 'flex-1 text-left hover:text-blue-400';
+        btn.textContent = data.name;
+        btn.onclick = () => enterTopic({id: d.id, name: data.name});
+        row.appendChild(btn);
+        topicsList.appendChild(row);
+      });
+    }
+    topicSearch.addEventListener('input', e => loadTopics(e.target.value));
+    addTopicBtn.addEventListener('click', async () => {
+      const name = prompt('Nama topik:');
+      if (name) {
+        await addDoc(collection(db, 'users', uid, 'subjects', currentSubject.id, 'topics'), {name, createdAt: Date.now()});
+        loadTopics();
+      }
+    });
+    backToSubjects.addEventListener('click', () => showPage('subjects'));
+    function enterTopic(t) {
+      currentTopic = t;
+      document.getElementById('currentTopicName').textContent = t.name;
+      showPage('facts');
+      loadFacts();
+    }
+
+    // === Facts ===
+    const factSearch = document.getElementById('factSearch');
+    const addFactBtn = document.getElementById('addFactBtn');
+    const factsList = document.getElementById('factsList');
+    const backToTopics = document.getElementById('backToTopics');
+
+    async function loadFacts(filterText = '') {
+      if (!uid || !currentSubject || !currentTopic) return;
+      factsList.innerHTML = '';
+      const q = query(collection(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts'), orderBy('createdAt', 'asc'));
+      const snap = await getDocs(q);
+      snap.forEach(d => {
+        const data = d.data();
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between bg-slate-800 rounded px-3 py-2';
+        const btn = document.createElement('button');
+        btn.className = 'flex-1 text-left hover:text-blue-400';
+        btn.textContent = data.title;
+        btn.onclick = () => enterFact({id: d.id, ...data});
+        row.appendChild(btn);
+        factsList.appendChild(row);
+      });
+    }
+    factSearch.addEventListener('input', e => loadFacts(e.target.value));
+    addFactBtn.addEventListener('click', async () => {
+      const title = prompt('Tajuk fakta:');
+      const sentence = prompt('Ayat fakta:');
+      if (title && sentence) {
+        await addDoc(collection(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts'), {
+          title, sentence, attempts: 0, createdAt: Date.now()
+        });
+        loadFacts();
+      }
+    });
+    backToTopics.addEventListener('click', () => showPage('topics'));
+    function enterFact(f) {
+      currentFact = f;
+      document.getElementById('practiceFactTitle').textContent = f.title;
+      document.getElementById('practiceFactSentence').textContent = f.sentence;
+      document.getElementById('practiceCount').textContent = f.attempts || 0;
+      document.getElementById('practiceRows').innerHTML = '';
+      showPage('practice');
+    }
+
+    // === Practice ===
+    const addPracticeRowBtn = document.getElementById('addPracticeRowBtn');
+    const submitPracticeBtn = document.getElementById('submitPracticeBtn');
+    const practiceRows = document.getElementById('practiceRows');
+    const practiceFeedback = document.getElementById('practiceFeedback');
+    const backToFacts = document.getElementById('backToFacts');
+
+    function createRow(sentence) {
+      const row = document.createElement('div');
+      row.className = 'flex flex-wrap gap-2';
+      Array.from(sentence).forEach(ch => {
+        if (ch === ' ') {
+          const spacer = document.createElement('div');
+          spacer.className = 'w-3';
+          row.appendChild(spacer);
+        } else {
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.maxLength = 1;
+          input.className = 'w-8 h-8 text-center rounded bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-700';
+          input.dataset.char = ch;
+          row.appendChild(input);
+        }
+      });
+      return row;
+    }
+
+    addPracticeRowBtn.addEventListener('click', () => {
+      if (currentFact) {
+        practiceRows.appendChild(createRow(currentFact.sentence));
+      }
+    });
+
+    submitPracticeBtn.addEventListener('click', async () => {
+      let total = 0, correct = 0;
+      practiceRows.querySelectorAll('input').forEach(inp => {
+        total++;
+        if (inp.value === inp.dataset.char) {
+          inp.classList.add('bg-green-800');
+          correct++;
+        } else {
+          inp.classList.add('bg-red-800');
+        }
+      });
+      practiceFeedback.textContent = `Betul ${correct}/${total}`;
+      if (currentFact) {
+        const ref = doc(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts', currentFact.id);
+        await updateDoc(ref, {attempts: (currentFact.attempts || 0) + 1});
+        currentFact.attempts++;
+        document.getElementById('practiceCount').textContent = currentFact.attempts;
+      }
+    });
+
+    backToFacts.addEventListener('click', () => showPage('facts'));
   </script>
 </body>
 </html>
+
+
