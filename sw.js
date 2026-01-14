@@ -1,13 +1,13 @@
 // Nama cache
-const CACHE_NAME = 'hafalan-retyping-v8';
+const CACHE_NAME = 'hafalan-retyping-v9';
 
-// Fail yang diprecache (shell app)
+// Fail yang diprecache (shell app) — ikut base path GitHub Pages
 const PRECACHE = [
-  '/',
-  '/index.html',
-  '/manifest.webmanifest',
-  '/icon-192.png',
-  '/icon-512.png'
+  '/hafalan-retyping/',
+  '/hafalan-retyping/index.html',
+  '/hafalan-retyping/manifest.webmanifest',
+  '/hafalan-retyping/icon-192.png',
+  '/hafalan-retyping/icon-512.png'
 ];
 
 // Install event: cache fail asas
