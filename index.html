@@ -247,6 +247,7 @@
 
         const row = document.createElement('div');
         row.className = 'flex items-center justify-between bg-slate-800 rounded px-3 py-2';
+        
         const btn = document.createElement('button');
         btn.className = 'flex-1 text-left hover:text-blue-400';
         btn.textContent = data.name;
@@ -287,6 +288,7 @@
         subjectsList.appendChild(row);
       });
     }
+
     subjectSearch.addEventListener('input', e => loadSubjects(e.target.value));
     addSubjectBtn.addEventListener('click', async () => {
       const name = prompt('Nama subjek:');
@@ -295,12 +297,13 @@
         loadSubjects(subjectSearch.value || '');
       }
     });
+
     function enterSubject(s) {
       currentSubject = s;
       document.getElementById('currentSubjectName').textContent = s.name;
       showPage('topics');
       loadTopics();
-    }
+        }
 
     // === Topics ===
     const topicSearch = document.getElementById('topicSearch');
@@ -319,6 +322,7 @@
 
         const row = document.createElement('div');
         row.className = 'flex items-center justify-between bg-slate-800 rounded px-3 py-2';
+        
         const btn = document.createElement('button');
         btn.className = 'flex-1 text-left hover:text-blue-400';
         btn.textContent = data.name;
@@ -355,6 +359,7 @@
         topicsList.appendChild(row);
       });
     }
+
     topicSearch.addEventListener('input', e => loadTopics(e.target.value));
     addTopicBtn.addEventListener('click', async () => {
       const name = prompt('Nama topik:');
@@ -363,7 +368,9 @@
         loadTopics(topicSearch.value || '');
       }
     });
+
     backToSubjects.addEventListener('click', () => showPage('subjects'));
+
     function enterTopic(t) {
       currentTopic = t;
       document.getElementById('currentTopicName').textContent = t.name;
@@ -388,27 +395,42 @@
 
         const row = document.createElement('div');
         row.className = 'flex items-center justify-between bg-slate-800 rounded px-3 py-2';
+        
         const btn = document.createElement('button');
         btn.className = 'flex-1 text-left hover:text-blue-400';
         btn.textContent = data.title;
         btn.onclick = () => enterFact({id: d.id, ...data});
         row.appendChild(btn);
 
-        const editBtn = document.createElement('button');
-        editBtn.textContent = '✏️';
-        editBtn.className = 'ml-2 text-sm';
-        editBtn.onclick = async () => {
+        // Butang edit tajuk
+        const editTitleBtn = document.createElement('button');
+        editTitleBtn.textContent = '✏️ Tajuk';
+        editTitleBtn.className = 'ml-2 text-sm';
+        editTitleBtn.onclick = async () => {
           const newTitle = prompt('Tajuk baru:', data.title);
-          const newSentence = prompt('Ayat baru:', data.sentence);
-          if (newTitle && newSentence) {
+          if (newTitle) {
             await updateDoc(doc(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts', d.id), {
-              title: newTitle,
+              title: newTitle
+            });
+            loadFacts(factSearch.value || '');
+          }
+        };
+
+        // Butang edit ayat
+        const editSentenceBtn = document.createElement('button');
+        editSentenceBtn.textContent = '✏️ Ayat';
+        editSentenceBtn.className = 'ml-2 text-sm';
+        editSentenceBtn.onclick = async () => {
+          const newSentence = prompt('Ayat baru:', data.sentence);
+          if (newSentence) {
+            await updateDoc(doc(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts', d.id), {
               sentence: newSentence
             });
             loadFacts(factSearch.value || '');
           }
         };
 
+        // Butang delete
         const delBtn = document.createElement('button');
         delBtn.textContent = '🗑️';
         delBtn.className = 'ml-2 text-sm';
@@ -419,11 +441,13 @@
           }
         };
 
-        row.appendChild(editBtn);
+        row.appendChild(editTitleBtn);
+        row.appendChild(editSentenceBtn);
         row.appendChild(delBtn);
         factsList.appendChild(row);
       });
     }
+
     factSearch.addEventListener('input', e => loadFacts(e.target.value));
     addFactBtn.addEventListener('click', async () => {
       const title = prompt('Tajuk fakta:');
@@ -435,7 +459,9 @@
         loadFacts(factSearch.value || '');
       }
     });
+
     backToTopics.addEventListener('click', () => showPage('topics'));
+
     function enterFact(f) {
       currentFact = f;
       document.getElementById('practiceFactTitle').textContent = f.title;
@@ -468,6 +494,15 @@
           input.maxLength = 1;
           input.className = 'w-8 h-8 text-center rounded bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-700';
           input.dataset.char = ch;
+
+          // Default huruf kecil
+          input.style.textTransform = 'lowercase';
+          input.autocapitalize = 'none';
+          input.spellcheck = false;
+          input.addEventListener('input', () => {
+            input.value = input.value.toLowerCase();
+          });
+
           inputs.push(input);
           row.appendChild(input);
         }
@@ -521,6 +556,7 @@
     });
 
     backToFacts.addEventListener('click', () => showPage('facts'));
-  </script>
+
+    </script>
 </body>
 </html>
