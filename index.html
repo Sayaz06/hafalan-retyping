@@ -232,13 +232,218 @@
     }
 
     // === Subjects ===
-    // (kod Subjects sama seperti yang awak bagi sebelum ini)
+    const subjectSearch = document.getElementById('subjectSearch');
+    const addSubjectBtn = document.getElementById('addSubjectBtn');
+    const subjectsList = document.getElementById('subjectsList');
+
+    async function loadSubjects(filterText = '') {
+      if (!uid) return;
+      subjectsList.innerHTML = '';
+      const q = query(collection(db, 'users', uid, 'subjects'), orderBy('createdAt', 'asc'));
+      const snap = await getDocs(q);
+      snap.forEach(d => {
+        const data = d.data();
+        if (filterText && !data.name.toLowerCase().includes(filterText.toLowerCase())) return;
+
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between bg-slate-800 rounded px-3 py-2';
+        const btn = document.createElement('button');
+        btn.className = 'flex-1 text-left hover:text-blue-400';
+        btn.textContent = data.name;
+        btn.onclick = () => enterSubject({id: d.id, name: data.name});
+        row.appendChild(btn);
+
+        const editBtn = document.createElement('button');
+        editBtn.textContent = '✏️';
+        editBtn.className = 'ml-2 text-sm';
+        editBtn.onclick = async () => {
+          const newName = prompt('Nama baru subjek:', data.name);
+          if (newName) {
+            await updateDoc(doc(db, 'users', uid, 'subjects', d.id), { name: newName });
+            loadSubjects(subjectSearch.value || '');
+          }
+        };
+
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '🗑️';
+        delBtn.className = 'ml-2 text-sm';
+        delBtn.onclick = async () => {
+          if (confirm('Padam subjek dan semua topik/fakta di dalamnya?')) {
+            const topicsSnap = await getDocs(collection(db, 'users', uid, 'subjects', d.id, 'topics'));
+            for (const t of topicsSnap.docs) {
+              const factsSnap = await getDocs(collection(db, 'users', uid, 'subjects', d.id, 'topics', t.id, 'facts'));
+              for (const f of factsSnap.docs) {
+                await deleteDoc(f.ref);
+              }
+              await deleteDoc(t.ref);
+            }
+            await deleteDoc(doc(db, 'users', uid, 'subjects', d.id));
+            loadSubjects(subjectSearch.value || '');
+          }
+        };
+
+        row.appendChild(editBtn);
+        row.appendChild(delBtn);
+        subjectsList.appendChild(row);
+      });
+    }
+    subjectSearch.addEventListener('input', e => loadSubjects(e.target.value));
+    addSubjectBtn.addEventListener('click', async () => {
+      const name = prompt('Nama subjek:');
+      if (name) {
+        await addDoc(collection(db, 'users', uid, 'subjects'), {name, createdAt: Date.now()});
+        loadSubjects(subjectSearch.value || '');
+      }
+    });
+    function enterSubject(s) {
+      currentSubject = s;
+      document.getElementById('currentSubjectName').textContent = s.name;
+      showPage('topics');
+      loadTopics();
+    }
 
     // === Topics ===
-    // (kod Topics sama seperti yang awak bagi sebelum ini)
+    const topicSearch = document.getElementById('topicSearch');
+    const addTopicBtn = document.getElementById('addTopicBtn');
+    const topicsList = document.getElementById('topicsList');
+    const backToSubjects = document.getElementById('backToSubjects');
+
+    async function loadTopics(filterText = '') {
+      if (!uid || !currentSubject) return;
+      topicsList.innerHTML = '';
+      const q = query(collection(db, 'users', uid, 'subjects', currentSubject.id, 'topics'), orderBy('createdAt', 'asc'));
+      const snap = await getDocs(q);
+      snap.forEach(d => {
+        const data = d.data();
+        if (filterText && !data.name.toLowerCase().includes(filterText.toLowerCase())) return;
+
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between bg-slate-800 rounded px-3 py-2';
+        const btn = document.createElement('button');
+        btn.className = 'flex-1 text-left hover:text-blue-400';
+        btn.textContent = data.name;
+        btn.onclick = () => enterTopic({id: d.id, name: data.name});
+        row.appendChild(btn);
+
+        const editBtn = document.createElement('button');
+        editBtn.textContent = '✏️';
+        editBtn.className = 'ml-2 text-sm';
+        editBtn.onclick = async () => {
+          const newName = prompt('Nama baru topik:', data.name);
+          if (newName) {
+            await updateDoc(doc(db, 'users', uid, 'subjects', currentSubject.id, 'topics', d.id), { name: newName });
+            loadTopics(topicSearch.value || '');
+          }
+        };
+
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '🗑️';
+        delBtn.className = 'ml-2 text-sm';
+        delBtn.onclick = async () => {
+          if (confirm('Padam topik dan semua fakta di dalamnya?')) {
+            const factsSnap = await getDocs(collection(db, 'users', uid, 'subjects', currentSubject.id, 'topics', d.id, 'facts'));
+            for (const f of factsSnap.docs) {
+              await deleteDoc(f.ref);
+            }
+            await deleteDoc(doc(db, 'users', uid, 'subjects', currentSubject.id, 'topics', d.id));
+            loadTopics(topicSearch.value || '');
+          }
+        };
+
+        row.appendChild(editBtn);
+        row.appendChild(delBtn);
+        topicsList.appendChild(row);
+      });
+    }
+    topicSearch.addEventListener('input', e => loadTopics(e.target.value));
+    addTopicBtn.addEventListener('click', async () => {
+      const name = prompt('Nama topik:');
+      if (name) {
+        await addDoc(collection(db, 'users', uid, 'subjects', currentSubject.id, 'topics'), {name, createdAt: Date.now()});
+        loadTopics(topicSearch.value || '');
+      }
+    });
+    backToSubjects.addEventListener('click', () => showPage('subjects'));
+    function enterTopic(t) {
+      currentTopic = t;
+      document.getElementById('currentTopicName').textContent = t.name;
+      showPage('facts');
+      loadFacts();
+    }
 
     // === Facts ===
-    // (kod Facts sama seperti yang awak bagi sebelum ini)
+    const factSearch = document.getElementById('factSearch');
+    const addFactBtn = document.getElementById('addFactBtn');
+    const factsList = document.getElementById('factsList');
+    const backToTopics = document.getElementById('backToTopics');
+
+    async function loadFacts(filterText = '') {
+      if (!uid || !currentSubject || !currentTopic) return;
+      factsList.innerHTML = '';
+      const q = query(collection(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts'), orderBy('createdAt', 'asc'));
+      const snap = await getDocs(q);
+      snap.forEach(d => {
+        const data = d.data();
+        if (filterText && !data.title.toLowerCase().includes(filterText.toLowerCase())) return;
+
+        const row = document.createElement('div');
+        row.className = 'flex items-center justify-between bg-slate-800 rounded px-3 py-2';
+        const btn = document.createElement('button');
+        btn.className = 'flex-1 text-left hover:text-blue-400';
+        btn.textContent = data.title;
+        btn.onclick = () => enterFact({id: d.id, ...data});
+        row.appendChild(btn);
+
+        const editBtn = document.createElement('button');
+        editBtn.textContent = '✏️';
+        editBtn.className = 'ml-2 text-sm';
+        editBtn.onclick = async () => {
+          const newTitle = prompt('Tajuk baru:', data.title);
+          const newSentence = prompt('Ayat baru:', data.sentence);
+          if (newTitle && newSentence) {
+            await updateDoc(doc(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts', d.id), {
+              title: newTitle,
+              sentence: newSentence
+            });
+            loadFacts(factSearch.value || '');
+          }
+        };
+
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '🗑️';
+        delBtn.className = 'ml-2 text-sm';
+        delBtn.onclick = async () => {
+          if (confirm('Padam fakta ini?')) {
+            await deleteDoc(doc(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts', d.id));
+            loadFacts(factSearch.value || '');
+          }
+        };
+
+        row.appendChild(editBtn);
+        row.appendChild(delBtn);
+        factsList.appendChild(row);
+      });
+    }
+    factSearch.addEventListener('input', e => loadFacts(e.target.value));
+    addFactBtn.addEventListener('click', async () => {
+      const title = prompt('Tajuk fakta:');
+      const sentence = prompt('Ayat fakta:');
+      if (title && sentence) {
+        await addDoc(collection(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts'), {
+          title, sentence, attempts: 0, createdAt: Date.now()
+        });
+        loadFacts(factSearch.value || '');
+      }
+    });
+    backToTopics.addEventListener('click', () => showPage('topics'));
+    function enterFact(f) {
+      currentFact = f;
+      document.getElementById('practiceFactTitle').textContent = f.title;
+      document.getElementById('practiceFactSentence').textContent = f.sentence;
+      document.getElementById('practiceCount').textContent = f.attempts || 0;
+      document.getElementById('practiceRows').innerHTML = '';
+      showPage('practice');
+    }
 
     // === Practice ===
     const addPracticeRowBtn = document.getElementById('addPracticeRowBtn');
@@ -319,5 +524,4 @@
   </script>
 </body>
 </html>
-
 
