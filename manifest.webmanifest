@@ -1,9 +1,7 @@
 {
   "name": "hafalan retyping",
-  "short_name": "retyping",
-  "description": "PWA untuk menghafal fakta dengan retyping huruf dalam kotak.",
-  "start_url": "/",
-  "scope": "/",
+  "short_name": "hafalan",
+  "start_url": "/hafalan-retyping/",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
