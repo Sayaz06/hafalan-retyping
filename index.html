@@ -251,6 +251,40 @@
         btn.textContent = data.name;
         btn.onclick = () => enterSubject({id: d.id, name: data.name});
         row.appendChild(btn);
+
+        // Edit & Delete buttons
+        const editBtn = document.createElement('button');
+        editBtn.textContent = '✏️';
+        editBtn.className = 'ml-2 text-sm';
+        editBtn.onclick = async () => {
+          const newName = prompt('Nama baru subjek:', data.name);
+          if (newName) {
+            await updateDoc(doc(db, 'users', uid, 'subjects', d.id), { name: newName });
+            loadSubjects();
+          }
+        };
+
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '🗑️';
+        delBtn.className = 'ml-2 text-sm';
+        delBtn.onclick = async () => {
+          if (confirm('Padam subjek dan semua topik/fakta di dalamnya?')) {
+            // delete all topics & facts
+            const topicsSnap = await getDocs(collection(db, 'users', uid, 'subjects', d.id, 'topics'));
+            for (const t of topicsSnap.docs) {
+              const factsSnap = await getDocs(collection(db, 'users', uid, 'subjects', d.id, 'topics', t.id, 'facts'));
+              for (const f of factsSnap.docs) {
+                await deleteDoc(f.ref);
+              }
+              await deleteDoc(t.ref);
+            }
+            await deleteDoc(doc(db, 'users', uid, 'subjects', d.id));
+            loadSubjects();
+          }
+        };
+
+        row.appendChild(editBtn);
+        row.appendChild(delBtn);
         subjectsList.appendChild(row);
       });
     }
@@ -289,6 +323,35 @@
         btn.textContent = data.name;
         btn.onclick = () => enterTopic({id: d.id, name: data.name});
         row.appendChild(btn);
+
+        // Edit & Delete buttons
+        const editBtn = document.createElement('button');
+        editBtn.textContent = '✏️';
+        editBtn.className = 'ml-2 text-sm';
+        editBtn.onclick = async () => {
+          const newName = prompt('Nama baru topik:', data.name);
+          if (newName) {
+            await updateDoc(doc(db, 'users', uid, 'subjects', currentSubject.id, 'topics', d.id), { name: newName });
+            loadTopics();
+          }
+        };
+
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '🗑️';
+        delBtn.className = 'ml-2 text-sm';
+        delBtn.onclick = async () => {
+          if (confirm('Padam topik dan semua fakta di dalamnya?')) {
+            const factsSnap = await getDocs(collection(db, 'users', uid, 'subjects', currentSubject.id, 'topics', d.id, 'facts'));
+            for (const f of factsSnap.docs) {
+              await deleteDoc(f.ref);
+            }
+            await deleteDoc(doc(db, 'users', uid, 'subjects', currentSubject.id, 'topics', d.id));
+            loadTopics();
+          }
+        };
+
+        row.appendChild(editBtn);
+        row.appendChild(delBtn);
         topicsList.appendChild(row);
       });
     }
@@ -328,6 +391,35 @@
         btn.textContent = data.title;
         btn.onclick = () => enterFact({id: d.id, ...data});
         row.appendChild(btn);
+
+        // Edit & Delete buttons
+        const editBtn = document.createElement('button');
+        editBtn.textContent = '✏️';
+        editBtn.className = 'ml-2 text-sm';
+        editBtn.onclick = async () => {
+          const newTitle = prompt('Tajuk baru:', data.title);
+          const newSentence = prompt('Ayat baru:', data.sentence);
+          if (newTitle && newSentence) {
+            await updateDoc(doc(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts', d.id), {
+              title: newTitle,
+              sentence: newSentence
+            });
+            loadFacts();
+          }
+        };
+
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '🗑️';
+        delBtn.className = 'ml-2 text-sm';
+        delBtn.onclick = async () => {
+          if (confirm('Padam fakta ini?')) {
+            await deleteDoc(doc(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts', d.id));
+            loadFacts();
+          }
+        };
+
+        row.appendChild(editBtn);
+        row.appendChild(delBtn);
         factsList.appendChild(row);
       });
     }
@@ -409,5 +501,9 @@
   </script>
 </body>
 </html>
+
+
+
+
 
 
