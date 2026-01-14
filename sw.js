@@ -1,5 +1,5 @@
 // Nama cache
-const CACHE_NAME = 'hafalan-retyping-v5';
+const CACHE_NAME = 'hafalan-retyping-v6';
 
 // Fail yang diprecache (shell app)
 const PRECACHE = [
