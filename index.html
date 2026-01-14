@@ -53,7 +53,7 @@
       </div>
     </section>
 
-    <!-- Page subjects -->
+<!-- Page subjects -->
     <section id="page-subjects" class="hidden">
       <div class="mb-4 flex items-center gap-2">
         <input id="subjectSearch" type="text" placeholder="Cari subjek..." 
@@ -88,7 +88,7 @@
       <div id="topicsList" class="grid gap-2"></div>
     </section>
 
-    <!-- Page facts -->
+<!-- Page facts -->
     <section id="page-facts" class="hidden">
       <div class="mb-2 flex items-center justify-between">
         <button id="backToTopics" 
@@ -143,9 +143,8 @@
       </div>
       <p id="practiceFeedback" class="mt-2 text-slate-300"></p>
     </section>
-  </main>
 
-  <footer class="px-4 py-6 text-center text-sm text-slate-400">
+<footer class="px-4 py-6 text-center text-sm text-slate-400">
     Dibina untuk menghafal fakta dengan menulis semula huruf dalam ruang kosong.
   </footer>
 
@@ -247,65 +246,8 @@
 
         const row = document.createElement('div');
         row.className = 'flex items-center justify-between bg-slate-800 rounded px-3 py-2';
-        
-        const btn = document.createElement('button');
-        btn.className = 'flex-1 text-left hover:text-blue-400';
-        btn.textContent = data.name;
-        btn.onclick = () => enterSubject({id: d.id, name: data.name});
-        row.appendChild(btn);
 
-        const editBtn = document.createElement('button');
-        editBtn.textContent = '✏️';
-        editBtn.className = 'ml-2 text-sm';
-        editBtn.onclick = async () => {
-          const newName = prompt('Nama baru subjek:', data.name);
-          if (newName) {
-            await updateDoc(doc(db, 'users', uid, 'subjects', d.id), { name: newName });
-            loadSubjects(subjectSearch.value || '');
-          }
-        };
-
-        const delBtn = document.createElement('button');
-        delBtn.textContent = '🗑️';
-        delBtn.className = 'ml-2 text-sm';
-        delBtn.onclick = async () => {
-          if (confirm('Padam subjek dan semua topik/fakta di dalamnya?')) {
-            const topicsSnap = await getDocs(collection(db, 'users', uid, 'subjects', d.id, 'topics'));
-            for (const t of topicsSnap.docs) {
-              const factsSnap = await getDocs(collection(db, 'users', uid, 'subjects', d.id, 'topics', t.id, 'facts'));
-              for (const f of factsSnap.docs) {
-                await deleteDoc(f.ref);
-              }
-              await deleteDoc(t.ref);
-            }
-            await deleteDoc(doc(db, 'users', uid, 'subjects', d.id));
-            loadSubjects(subjectSearch.value || '');
-          }
-        };
-
-        row.appendChild(editBtn);
-        row.appendChild(delBtn);
-        subjectsList.appendChild(row);
-      });
-    }
-
-    subjectSearch.addEventListener('input', e => loadSubjects(e.target.value));
-    addSubjectBtn.addEventListener('click', async () => {
-      const name = prompt('Nama subjek:');
-      if (name) {
-        await addDoc(collection(db, 'users', uid, 'subjects'), {name, createdAt: Date.now()});
-        loadSubjects(subjectSearch.value || '');
-      }
-    });
-
-    function enterSubject(s) {
-      currentSubject = s;
-      document.getElementById('currentSubjectName').textContent = s.name;
-      showPage('topics');
-      loadTopics();
-        }
-
-    // === Topics ===
+// === Topics ===
     const topicSearch = document.getElementById('topicSearch');
     const addTopicBtn = document.getElementById('addTopicBtn');
     const topicsList = document.getElementById('topicsList');
@@ -378,7 +320,7 @@
       loadFacts();
     }
 
-    // === Facts ===
+// === Facts ===
     const factSearch = document.getElementById('factSearch');
     const addFactBtn = document.getElementById('addFactBtn');
     const factsList = document.getElementById('factsList');
@@ -462,13 +404,13 @@
 
     backToTopics.addEventListener('click', () => showPage('topics'));
 
-    function enterFact(f) {
+async function enterFact(f) {
       currentFact = f;
       document.getElementById('practiceFactTitle').textContent = f.title;
       document.getElementById('practiceFactSentence').textContent = f.sentence;
       document.getElementById('practiceCount').textContent = f.attempts || 0;
-      document.getElementById('practiceRows').innerHTML = '';
       showPage('practice');
+      await loadPracticeRows();
     }
 
     // === Practice ===
@@ -529,34 +471,95 @@
       return row;
     }
 
-    addPracticeRowBtn.addEventListener('click', () => {
+    addPracticeRowBtn.addEventListener('click', async () => {
       if (currentFact) {
-        practiceRows.appendChild(createRow(currentFact.sentence));
+        const ref = doc(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts', currentFact.id);
+        const rowsCol = collection(ref, 'rows');
+        await addDoc(rowsCol, {
+          sentence: currentFact.sentence,
+          createdAt: Date.now(),
+          answers: []
+        });
+        loadPracticeRows();
       }
     });
 
     submitPracticeBtn.addEventListener('click', async () => {
       let total = 0, correct = 0;
+      const answers = [];
+
       practiceRows.querySelectorAll('input').forEach(inp => {
         total++;
-        if (inp.value === inp.dataset.char) {
+        const isCorrect = inp.value === inp.dataset.char;
+        answers.push({char: inp.dataset.char, input: inp.value, correct: isCorrect});
+        if (isCorrect) {
           inp.classList.add('bg-green-800');
           correct++;
         } else {
           inp.classList.add('bg-red-800');
         }
       });
+
       practiceFeedback.textContent = `Betul ${correct}/${total}`;
+
       if (currentFact) {
         const ref = doc(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts', currentFact.id);
         await updateDoc(ref, {attempts: (currentFact.attempts || 0) + 1});
         currentFact.attempts++;
         document.getElementById('practiceCount').textContent = currentFact.attempts;
+
+        // Update row terakhir dengan jawapan
+        const rowsCol = collection(ref, 'rows');
+        const q = query(rowsCol, orderBy('createdAt', 'desc'));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          const lastRow = snap.docs[0];
+          await updateDoc(lastRow.ref, {answers, correct, total});
+        }
       }
     });
 
+    async function loadPracticeRows() {
+      practiceRows.innerHTML = '';
+      const ref = doc(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts', currentFact.id);
+      const q = query(collection(ref, 'rows'), orderBy('createdAt', 'asc'));
+      const snap = await getDocs(q);
+
+      snap.forEach(d => {
+        const data = d.data();
+        const rowWrapper = document.createElement('div');
+        rowWrapper.className = 'space-y-1';
+
+        const row = createRow(data.sentence);
+        if (data.answers && data.answers.length > 0) {
+          row.querySelectorAll('input').forEach((inp, i) => {
+            inp.value = data.answers[i].input;
+            if (data.answers[i].correct) inp.classList.add('bg-green-800');
+            else inp.classList.add('bg-red-800');
+          });
+        }
+        rowWrapper.appendChild(row);
+
+        const meta = document.createElement('div');
+        meta.className = 'flex justify-between text-xs text-slate-400';
+        meta.textContent = `Siap pada ${new Date(data.createdAt).toLocaleString()}`;
+
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '🗑️ Buang history';
+        delBtn.className = 'ml-2';
+        delBtn.onclick = async () => {
+          await deleteDoc(d.ref);
+          loadPracticeRows();
+        };
+        meta.appendChild(delBtn);
+
+        rowWrapper.appendChild(meta);
+        practiceRows.appendChild(rowWrapper);
+      });
+    }
+
     backToFacts.addEventListener('click', () => showPage('facts'));
 
-    </script>
+</script>
 </body>
 </html>
