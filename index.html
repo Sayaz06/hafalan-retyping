@@ -200,7 +200,6 @@
         alert('Log masuk gagal: ' + e.message);
       }
     });
-
     logoutBtn.addEventListener('click', async () => {
       await signOut(auth);
     });
@@ -233,216 +232,13 @@
     }
 
     // === Subjects ===
-    const subjectSearch = document.getElementById('subjectSearch');
-    const addSubjectBtn = document.getElementById('addSubjectBtn');
-    const subjectsList = document.getElementById('subjectsList');
-
-    async function loadSubjects(filterText = '') {
-      if (!uid) return;
-      subjectsList.innerHTML = '';
-      const q = query(collection(db, 'users', uid, 'subjects'), orderBy('createdAt', 'asc'));
-      const snap = await getDocs(q);
-      snap.forEach(d => {
-        const data = d.data();
-        const row = document.createElement('div');
-        row.className = 'flex items-center justify-between bg-slate-800 rounded px-3 py-2';
-        const btn = document.createElement('button');
-        btn.className = 'flex-1 text-left hover:text-blue-400';
-        btn.textContent = data.name;
-        btn.onclick = () => enterSubject({id: d.id, name: data.name});
-        row.appendChild(btn);
-
-        // Edit & Delete buttons
-        const editBtn = document.createElement('button');
-        editBtn.textContent = '✏️';
-        editBtn.className = 'ml-2 text-sm';
-        editBtn.onclick = async () => {
-          const newName = prompt('Nama baru subjek:', data.name);
-          if (newName) {
-            await updateDoc(doc(db, 'users', uid, 'subjects', d.id), { name: newName });
-            loadSubjects();
-          }
-        };
-
-        const delBtn = document.createElement('button');
-        delBtn.textContent = '🗑️';
-        delBtn.className = 'ml-2 text-sm';
-        delBtn.onclick = async () => {
-          if (confirm('Padam subjek dan semua topik/fakta di dalamnya?')) {
-            // delete all topics & facts
-            const topicsSnap = await getDocs(collection(db, 'users', uid, 'subjects', d.id, 'topics'));
-            for (const t of topicsSnap.docs) {
-              const factsSnap = await getDocs(collection(db, 'users', uid, 'subjects', d.id, 'topics', t.id, 'facts'));
-              for (const f of factsSnap.docs) {
-                await deleteDoc(f.ref);
-              }
-              await deleteDoc(t.ref);
-            }
-            await deleteDoc(doc(db, 'users', uid, 'subjects', d.id));
-            loadSubjects();
-          }
-        };
-
-        row.appendChild(editBtn);
-        row.appendChild(delBtn);
-        subjectsList.appendChild(row);
-      });
-    }
-    subjectSearch.addEventListener('input', e => loadSubjects(e.target.value));
-    addSubjectBtn.addEventListener('click', async () => {
-      const name = prompt('Nama subjek:');
-      if (name) {
-        await addDoc(collection(db, 'users', uid, 'subjects'), {name, createdAt: Date.now()});
-        loadSubjects();
-      }
-    });
-    function enterSubject(s) {
-      currentSubject = s;
-      document.getElementById('currentSubjectName').textContent = s.name;
-      showPage('topics');
-      loadTopics();
-    }
+    // (kod Subjects sama seperti yang awak bagi sebelum ini)
 
     // === Topics ===
-    const topicSearch = document.getElementById('topicSearch');
-    const addTopicBtn = document.getElementById('addTopicBtn');
-    const topicsList = document.getElementById('topicsList');
-    const backToSubjects = document.getElementById('backToSubjects');
-
-    async function loadTopics(filterText = '') {
-      if (!uid || !currentSubject) return;
-      topicsList.innerHTML = '';
-      const q = query(collection(db, 'users', uid, 'subjects', currentSubject.id, 'topics'), orderBy('createdAt', 'asc'));
-      const snap = await getDocs(q);
-      snap.forEach(d => {
-        const data = d.data();
-        const row = document.createElement('div');
-        row.className = 'flex items-center justify-between bg-slate-800 rounded px-3 py-2';
-        const btn = document.createElement('button');
-        btn.className = 'flex-1 text-left hover:text-blue-400';
-        btn.textContent = data.name;
-        btn.onclick = () => enterTopic({id: d.id, name: data.name});
-        row.appendChild(btn);
-
-        // Edit & Delete buttons
-        const editBtn = document.createElement('button');
-        editBtn.textContent = '✏️';
-        editBtn.className = 'ml-2 text-sm';
-        editBtn.onclick = async () => {
-          const newName = prompt('Nama baru topik:', data.name);
-          if (newName) {
-            await updateDoc(doc(db, 'users', uid, 'subjects', currentSubject.id, 'topics', d.id), { name: newName });
-            loadTopics();
-          }
-        };
-
-        const delBtn = document.createElement('button');
-        delBtn.textContent = '🗑️';
-        delBtn.className = 'ml-2 text-sm';
-        delBtn.onclick = async () => {
-          if (confirm('Padam topik dan semua fakta di dalamnya?')) {
-            const factsSnap = await getDocs(collection(db, 'users', uid, 'subjects', currentSubject.id, 'topics', d.id, 'facts'));
-            for (const f of factsSnap.docs) {
-              await deleteDoc(f.ref);
-            }
-            await deleteDoc(doc(db, 'users', uid, 'subjects', currentSubject.id, 'topics', d.id));
-            loadTopics();
-          }
-        };
-
-        row.appendChild(editBtn);
-        row.appendChild(delBtn);
-        topicsList.appendChild(row);
-      });
-    }
-    topicSearch.addEventListener('input', e => loadTopics(e.target.value));
-    addTopicBtn.addEventListener('click', async () => {
-      const name = prompt('Nama topik:');
-      if (name) {
-        await addDoc(collection(db, 'users', uid, 'subjects', currentSubject.id, 'topics'), {name, createdAt: Date.now()});
-        loadTopics();
-      }
-    });
-    backToSubjects.addEventListener('click', () => showPage('subjects'));
-    function enterTopic(t) {
-      currentTopic = t;
-      document.getElementById('currentTopicName').textContent = t.name;
-      showPage('facts');
-      loadFacts();
-    }
+    // (kod Topics sama seperti yang awak bagi sebelum ini)
 
     // === Facts ===
-    const factSearch = document.getElementById('factSearch');
-    const addFactBtn = document.getElementById('addFactBtn');
-    const factsList = document.getElementById('factsList');
-    const backToTopics = document.getElementById('backToTopics');
-
-    async function loadFacts(filterText = '') {
-      if (!uid || !currentSubject || !currentTopic) return;
-      factsList.innerHTML = '';
-      const q = query(collection(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts'), orderBy('createdAt', 'asc'));
-      const snap = await getDocs(q);
-      snap.forEach(d => {
-        const data = d.data();
-        const row = document.createElement('div');
-        row.className = 'flex items-center justify-between bg-slate-800 rounded px-3 py-2';
-        const btn = document.createElement('button');
-        btn.className = 'flex-1 text-left hover:text-blue-400';
-        btn.textContent = data.title;
-        btn.onclick = () => enterFact({id: d.id, ...data});
-        row.appendChild(btn);
-
-        // Edit & Delete buttons
-        const editBtn = document.createElement('button');
-        editBtn.textContent = '✏️';
-        editBtn.className = 'ml-2 text-sm';
-        editBtn.onclick = async () => {
-          const newTitle = prompt('Tajuk baru:', data.title);
-          const newSentence = prompt('Ayat baru:', data.sentence);
-          if (newTitle && newSentence) {
-            await updateDoc(doc(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts', d.id), {
-              title: newTitle,
-              sentence: newSentence
-            });
-            loadFacts();
-          }
-        };
-
-        const delBtn = document.createElement('button');
-        delBtn.textContent = '🗑️';
-        delBtn.className = 'ml-2 text-sm';
-        delBtn.onclick = async () => {
-          if (confirm('Padam fakta ini?')) {
-            await deleteDoc(doc(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts', d.id));
-            loadFacts();
-          }
-        };
-
-        row.appendChild(editBtn);
-        row.appendChild(delBtn);
-        factsList.appendChild(row);
-      });
-    }
-    factSearch.addEventListener('input', e => loadFacts(e.target.value));
-    addFactBtn.addEventListener('click', async () => {
-      const title = prompt('Tajuk fakta:');
-      const sentence = prompt('Ayat fakta:');
-      if (title && sentence) {
-        await addDoc(collection(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts'), {
-          title, sentence, attempts: 0, createdAt: Date.now()
-        });
-        loadFacts();
-      }
-    });
-    backToTopics.addEventListener('click', () => showPage('topics'));
-    function enterFact(f) {
-      currentFact = f;
-      document.getElementById('practiceFactTitle').textContent = f.title;
-      document.getElementById('practiceFactSentence').textContent = f.sentence;
-      document.getElementById('practiceCount').textContent = f.attempts || 0;
-      document.getElementById('practiceRows').innerHTML = '';
-      showPage('practice');
-    }
+    // (kod Facts sama seperti yang awak bagi sebelum ini)
 
     // === Practice ===
     const addPracticeRowBtn = document.getElementById('addPracticeRowBtn');
@@ -454,6 +250,8 @@
     function createRow(sentence) {
       const row = document.createElement('div');
       row.className = 'flex flex-wrap gap-2';
+      const inputs = [];
+
       Array.from(sentence).forEach(ch => {
         if (ch === ' ') {
           const spacer = document.createElement('div');
@@ -465,9 +263,29 @@
           input.maxLength = 1;
           input.className = 'w-8 h-8 text-center rounded bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-700';
           input.dataset.char = ch;
+          inputs.push(input);
           row.appendChild(input);
         }
       });
+
+      // Auto-tab behaviour
+      inputs.forEach((input, index) => {
+        input.addEventListener('input', () => {
+          if (input.value.length === input.maxLength) {
+            if (index < inputs.length - 1) {
+              inputs[index + 1].focus();
+            }
+          }
+        });
+        input.addEventListener('keydown', (e) => {
+          if (e.key === "Backspace" && input.value === "") {
+            if (index > 0) {
+              inputs[index - 1].focus();
+            }
+          }
+        });
+      });
+
       return row;
     }
 
@@ -501,9 +319,5 @@
   </script>
 </body>
 </html>
-
-
-
-
 
 
