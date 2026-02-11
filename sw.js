@@ -1,5 +1,5 @@
 // Nama cache
-const CACHE_NAME = 'hafalan-retyping-v13';
+const CACHE_NAME = 'hafalan-retyping-v14';
 
 // Fail yang diprecache (shell app) — ikut base path GitHub Pages
 const PRECACHE = [
