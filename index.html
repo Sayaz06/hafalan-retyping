@@ -235,10 +235,10 @@
     const addSubjectBtn = document.getElementById('addSubjectBtn');
     const subjectsList = document.getElementById('subjectsList');
 
-    async function loadSubjects(filterText = '') {
+async function loadSubjects(filterText = '') {
       if (!uid) return;
       subjectsList.innerHTML = '';
-      const q = query(collection(db, 'users', uid, 'subjects'), orderBy('createdAt', 'asc'));
+      const q = query(collection(db, 'users', uid, 'subjects'), orderBy('name', 'asc'));
       const snap = await getDocs(q);
       snap.forEach(d => {
         const data = d.data();
@@ -310,10 +310,10 @@
     const topicsList = document.getElementById('topicsList');
     const backToSubjects = document.getElementById('backToSubjects');
 
-    async function loadTopics(filterText = '') {
+async function loadTopics(filterText = '') {
       if (!uid || !currentSubject) return;
       topicsList.innerHTML = '';
-      const q = query(collection(db, 'users', uid, 'subjects', currentSubject.id, 'topics'), orderBy('createdAt', 'asc'));
+      const q = query(collection(db, 'users', uid, 'subjects', currentSubject.id, 'topics'), orderBy('name', 'asc'));
       const snap = await getDocs(q);
       snap.forEach(d => {
         const data = d.data();
@@ -383,10 +383,10 @@
     const factsList = document.getElementById('factsList');
     const backToTopics = document.getElementById('backToTopics');
 
-    async function loadFacts(filterText = '') {
+async function loadFacts(filterText = '') {
       if (!uid || !currentSubject || !currentTopic) return;
       factsList.innerHTML = '';
-      const q = query(collection(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts'), orderBy('createdAt', 'asc'));
+      const q = query(collection(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts'), orderBy('title', 'asc'));
       const snap = await getDocs(q);
       snap.forEach(d => {
         const data = d.data();
