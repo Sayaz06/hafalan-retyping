@@ -497,21 +497,26 @@ async function loadFacts(filterText = '') {
           input.style.textTransform = 'lowercase';
           input.autocapitalize = 'none';
           input.spellcheck = false;
-          input.addEventListener('input', () => {
+input.addEventListener('input', () => {
             input.value = input.value.toLowerCase();
           });
+          
+          // Tambah ini untuk elakkan delay pemprosesan sistem keyboard
+          input.setAttribute('autocomplete', 'off');
+          input.setAttribute('inputmode', 'text'); // Memastikan keyboard muncul laju
 
           inputs.push(input);
           row.appendChild(input);
         }
       });
 
-      // Auto-tab behaviour
+// Auto-tab behaviour (Fast Response)
       inputs.forEach((input, index) => {
-        input.addEventListener('input', () => {
-          if (input.value.length === input.maxLength) {
+        input.addEventListener('input', (e) => {
+          if (input.value.length >= 1) {
             if (index < inputs.length - 1) {
-              inputs[index + 1].focus();
+              // Guna requestAnimationFrame untuk kelajuan input maksimum
+              requestAnimationFrame(() => inputs[index + 1].focus());
             }
           }
         });
@@ -619,5 +624,4 @@ async function loadFacts(filterText = '') {
   </script>
 </body>
 </html>
-
 
