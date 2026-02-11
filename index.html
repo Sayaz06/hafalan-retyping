@@ -32,7 +32,6 @@
   <link rel="icon" href="icon-192.png" sizes="192x192" type="image/png" />
   <link rel="apple-touch-icon" href="icon-192.png" />
 </head>
-
 <body class="min-h-screen bg-slate-900 text-white">
   <header class="flex items-center justify-between px-4 py-3 border-b border-slate-800">
     <h1 class="text-xl font-semibold tracking-wide">hafalan retyping</h1>
@@ -110,6 +109,45 @@
       <div id="factsList" class="grid gap-2"></div>
     </section>
 
+    <!-- Page practice -->
+    <section id="page-practice" class="hidden">
+      <div class="mb-2 flex items-center justify-between">
+        <button id="backToFacts" 
+                class="px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 text-sm">
+          Kembali
+        </button>
+        <div class="text-sm text-slate-300">
+          Jumlah ulangan: <span id="practiceCount">0</span>
+        </div>
+      </div>
+      <div class="mb-3">
+        <h4 class="font-semibold tracking-wide mb-1">Fakta</h4>
+        <div id="practiceFactTitle" class="text-slate-200"></div>
+      </div>
+      <div class="mb-3">
+        <h4 class="font-semibold tracking-wide mb-1">Ayat</h4>
+        <div id="practiceFactSentence" class="text-slate-200"></div>
+      </div>
+      <div class="mb-3">
+        <button id="addPracticeRowBtn" 
+                class="px-3 py-2 rounded bg-slate-800 hover:bg-slate-700 font-semibold">
+          Tambah ulangan
+        </button>
+      </div>
+      <div id="practiceRows" class="grid gap-4"></div>
+      <div class="mt-4">
+        <button id="submitPracticeBtn" 
+                class="px-4 py-2 rounded bg-slate-800 hover:bg-slate-700 font-semibold">
+          Selesai
+        </button>
+      </div>
+      <p id="practiceFeedback" class="mt-2 text-slate-300"></p>
+    </section>
+
+  <footer class="px-4 py-6 text-center text-sm text-slate-400">
+    Dibina untuk menghafal fakta dengan menulis semula huruf dalam ruang kosong.
+  </footer>
+
   <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -161,7 +199,6 @@
         alert('Log masuk gagal: ' + e.message);
       }
     });
-
     logoutBtn.addEventListener('click', async () => {
       await signOut(auth);
     });
@@ -188,7 +225,6 @@
       facts: document.getElementById('page-facts'),
       practice: document.getElementById('page-practice'),
     };
-
     function showPage(name) {
       Object.values(pages).forEach(el => el.classList.add('hidden'));
       pages[name].classList.remove('hidden');
@@ -425,7 +461,7 @@
 
     backToTopics.addEventListener('click', () => showPage('topics'));
 
-    function enterFact(f) {
+    async function enterFact(f) {
       currentFact = f;
       document.getElementById('practiceFactTitle').textContent = f.title;
       document.getElementById('practiceFactSentence').textContent = f.sentence;
@@ -581,11 +617,7 @@
     backToFacts.addEventListener('click', () => showPage('facts'));
 
   </script>
-
 </body>
 </html>
-
-
-
 
 
