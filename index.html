@@ -101,12 +101,25 @@
         <input id="factSearch" type="text" placeholder="Cari fakta..." 
                class="w-full px-3 py-2 rounded bg-slate-800 placeholder-slate-400 
                       focus:outline-none focus:ring-2 focus:ring-slate-700" />
-        <button id="addFactBtn" 
+<button id="addFactBtn" 
                 class="px-3 py-2 rounded bg-slate-800 hover:bg-slate-700 font-semibold">
           Tambah fakta hafalan
         </button>
+<button id="btnModTambah" class="px-3 py-2 rounded bg-slate-700 hover:bg-slate-600 font-semibold">
+          Mod Pantas
+        </button>
       </div>
-      <div id="factsList" class="grid gap-2"></div>
+
+      <div id="factsList" class="grid gap-2 mb-4"></div>
+
+      <div id="bulkAddContainer" class="hidden flex flex-col gap-2 mb-4 p-3 bg-slate-800/50 rounded-lg border border-slate-700">
+        <p class="text-xs text-slate-400">Format: Baris 1=Tajuk, Baris 2=Ayat. Selang baris kosong untuk fakta seterusnya.</p>
+        <textarea id="bulkFactsInput" rows="5" placeholder="Contoh:&#10;Kucing&#10;Kucing ada empat kaki&#10;&#10;Ayam&#10;Ayam bertelur" 
+                  class="w-full px-3 py-2 rounded bg-slate-900 text-sm focus:outline-none"></textarea>
+        <button id="btnTambahSemuaPantas" class="w-full py-2 rounded bg-blue-700 hover:bg-blue-600 font-bold text-sm">
+          Proses Masuk Semua
+        </button>
+      </div>
     </section>
 
     <!-- Page practice -->
@@ -461,6 +474,41 @@ async function loadFacts(filterText = '') {
 
     backToTopics.addEventListener('click', () => showPage('topics'));
 
+    // --- LOGIK MOD TAMBAH PANTAS ---
+    const btnModTambah = document.getElementById('btnModTambah');
+    const bulkAddContainer = document.getElementById('bulkAddContainer');
+    const bulkFactsInput = document.getElementById('bulkFactsInput');
+    const btnTambahSemuaPantas = document.getElementById('btnTambahSemuaPantas');
+
+    btnModTambah.addEventListener('click', () => {
+      bulkAddContainer.classList.toggle('hidden');
+    });
+
+    btnTambahSemuaPantas.addEventListener('click', async () => {
+      const raw = bulkFactsInput.value.trim();
+      if (!raw) return;
+      const blocks = raw.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
+      btnTambahSemuaPantas.disabled = true;
+      btnTambahSemuaPantas.textContent = `Sedang memproses ${blocks.length}...`;
+      try {
+        for (const block of blocks) {
+          const lines = block.split("\n").map(l => l.trim()).filter(Boolean);
+          if (lines.length < 2) continue;
+          await addDoc(collection(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts'), {
+            title: lines[0], 
+            sentence: lines.slice(1).join(" "), 
+            attempts: 0, createdAt: Date.now()
+          });
+        }
+        bulkFactsInput.value = "";
+        bulkAddContainer.classList.add('hidden');
+        loadFacts(factSearch.value || '');
+      } catch (err) { console.error(err); }
+      finally {
+        btnTambahSemuaPantas.disabled = false;
+        btnTambahSemuaPantas.textContent = "Proses Masuk Semua";
+      }
+    });
     async function enterFact(f) {
       currentFact = f;
       document.getElementById('practiceFactTitle').textContent = f.title;
