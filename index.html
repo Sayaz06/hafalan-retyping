@@ -393,69 +393,109 @@ async function loadTopics(filterText = '') {
     const backToTopics = document.getElementById('backToTopics');
 
 async function loadFacts(filterText = '') {
-      if (!uid || !currentSubject || !currentTopic) return;
-      factsList.innerHTML = '';
-      const q = query(collection(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts'), orderBy('title', 'asc'));
-      const snap = await getDocs(q);
-      snap.forEach(d => {
-        const data = d.data();
-        if (filterText && !data.title.toLowerCase().includes(filterText.toLowerCase())) return;
+  // Guard Clause: Pastikan data utama wujud sebelum muat
+  if (!uid || !currentSubject || !currentTopic) {
+    console.warn("Akses ditolak: Maklumat subjek atau topik tidak lengkap.");
+    return;
+  }
 
-        const row = document.createElement('div');
-        row.className = 'flex items-center justify-between bg-slate-800 rounded px-3 py-2';
-        
-        const btn = document.createElement('button');
-        btn.className = 'flex-1 text-left hover:text-blue-400';
-        btn.textContent = data.title;
-        btn.onclick = () => enterFact({id: d.id, ...data});
-        row.appendChild(btn);
+  factsList.innerHTML = '';
+  const q = query(collection(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts'), orderBy('title', 'asc'));
+  const snap = await getDocs(q);
 
-        // Butang edit tajuk
-        const editTitleBtn = document.createElement('button');
-        editTitleBtn.textContent = '✏️ Tajuk';
-        editTitleBtn.className = 'ml-2 text-sm';
-        editTitleBtn.onclick = async () => {
-          const newTitle = prompt('Tajuk baru:', data.title);
-          if (newTitle) {
-            await updateDoc(doc(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts', d.id), {
-              title: newTitle
-            });
-            loadFacts(factSearch.value || '');
-          }
-        };
+  snap.forEach(d => {
+    const data = d.data();
+    if (filterText && !data.title.toLowerCase().includes(filterText.toLowerCase())) return;
 
-        // Butang edit ayat
-        const editSentenceBtn = document.createElement('button');
-        editSentenceBtn.textContent = '✏️ Ayat';
-        editSentenceBtn.className = 'ml-2 text-sm';
-        editSentenceBtn.onclick = async () => {
-          const newSentence = prompt('Ayat baru:', data.sentence);
-          if (newSentence) {
-            await updateDoc(doc(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts', d.id), {
-              sentence: newSentence
-            });
-            loadFacts(factSearch.value || '');
-          }
-        };
+    const row = document.createElement('div');
+    row.className = 'flex flex-col sm:flex-row sm:items-center justify-between bg-slate-800 rounded px-3 py-2 gap-2';
 
-        // Butang delete
-        const delBtn = document.createElement('button');
-        delBtn.textContent = '🗑️';
-        delBtn.className = 'ml-2 text-sm';
-        delBtn.onclick = async () => {
-          if (confirm('Padam fakta ini?')) {
-            await deleteDoc(doc(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts', d.id));
-            loadFacts(factSearch.value || '');
-          }
-        };
+    // Bahagian Nama & Tajuk
+    const leftSide = document.createElement('div');
+    leftSide.className = 'flex-1 flex items-center gap-2 overflow-hidden';
 
-        row.appendChild(editTitleBtn);
-        row.appendChild(editSentenceBtn);
-        row.appendChild(delBtn);
-        factsList.appendChild(row);
-      });
-    }
+    const btn = document.createElement('button');
+    btn.className = 'text-left hover:text-blue-400 truncate font-medium';
+    btn.textContent = data.title;
+    btn.onclick = () => enterFact({ id: d.id, ...data });
+    leftSide.appendChild(btn);
 
+    // Container Butang Salin (Minimalis)
+    const copyGroup = document.createElement('div');
+    copyGroup.className = 'flex gap-1';
+
+    const createCopyBtn = (text, label) => {
+      const cBtn = document.createElement('button');
+      cBtn.innerHTML = `📋${label}`;
+      cBtn.className = 'px-2 py-1 text-xs rounded bg-slate-700 hover:bg-slate-600 transition-colors w-10';
+      
+      cBtn.onclick = async (e) => {
+        e.stopPropagation(); // Elak trigger mod latihan
+        try {
+          await navigator.clipboard.writeText(text);
+          const originalHTML = cBtn.innerHTML;
+          cBtn.innerHTML = '✅';
+          cBtn.classList.replace('bg-slate-700', 'bg-green-600');
+          
+          setTimeout(() => {
+            cBtn.innerHTML = originalHTML;
+            cBtn.classList.replace('bg-green-600', 'bg-slate-700');
+          }, 800);
+        } catch (err) {
+          console.error('Gagal salin:', err);
+        }
+      };
+      return cBtn;
+    };
+
+    copyGroup.appendChild(createCopyBtn(data.title, 'T'));
+    copyGroup.appendChild(createCopyBtn(data.sentence, 'A'));
+    leftSide.appendChild(copyGroup);
+
+    // Bahagian Aksi (Edit/Delete)
+    const actions = document.createElement('div');
+    actions.className = 'flex items-center gap-2 border-l border-slate-700 pl-2';
+
+    const editTitleBtn = document.createElement('button');
+    editTitleBtn.textContent = '✏️T';
+    editTitleBtn.className = 'text-xs text-slate-400 hover:text-white';
+    editTitleBtn.onclick = async (e) => {
+      e.stopPropagation();
+      const newTitle = prompt('Tajuk baru:', data.title);
+      if (newTitle) {
+        await updateDoc(doc(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts', d.id), { title: newTitle });
+        loadFacts(factSearch.value || '');
+      }
+    };
+
+    const editSentenceBtn = document.createElement('button');
+    editSentenceBtn.textContent = '✏️A';
+    editSentenceBtn.className = 'text-xs text-slate-400 hover:text-white';
+    editSentenceBtn.onclick = async (e) => {
+      e.stopPropagation();
+      const newSentence = prompt('Ayat baru:', data.sentence);
+      if (newSentence) {
+        await updateDoc(doc(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts', d.id), { sentence: newSentence });
+        loadFacts(factSearch.value || '');
+      }
+    };
+
+    const delBtn = document.createElement('button');
+    delBtn.textContent = '🗑️';
+    delBtn.className = 'text-sm hover:opacity-70';
+    delBtn.onclick = async (e) => {
+      e.stopPropagation();
+      if (confirm('Padam fakta ini?')) {
+        await deleteDoc(doc(db, 'users', uid, 'subjects', currentSubject.id, 'topics', currentTopic.id, 'facts', d.id));
+        loadFacts(factSearch.value || '');
+      }
+    };
+
+    actions.append(editTitleBtn, editSentenceBtn, delBtn);
+    row.append(leftSide, actions);
+    factsList.appendChild(row);
+  });
+}
 factSearch.addEventListener('input', e => loadFacts(e.target.value));
 
     backToTopics.addEventListener('click', () => showPage('topics'));
